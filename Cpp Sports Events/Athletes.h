@@ -17,11 +17,11 @@ public:
 	void readAthlete(const std::string str);
 	void readAthleteMu(const std::string str, std::vector<Athlete>&);
 	void readAthletesMu(std::vector<std::string>, int);
-	Athlete getAthlete(int i) const;
+	const Athlete getAthlete(const int i) const;
 	int getSize();
 	void combineMu();
-	Athlete& findById(int id);
-	std::vector<Athlete> findTheListOfYoungestAthletes(int);
+	Athlete* findById(const int id);
+	std::vector<Athlete> findTheListOfYoungestAthletes(const int);
 	friend std::ostream& operator<<(std::ostream& stream, const Athletes& ath);
 };
 

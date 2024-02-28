@@ -21,8 +21,6 @@ std::string* Countries::findCountry(std::string s)
 	if (it == countries.end())
 		return NULL;
 	return &(*it);
-	//auto* it2 = it._Ptr;
-	//return &(*it2);
 }
 
 void Countries::pushCountry(std::string str)

@@ -48,7 +48,6 @@ int main()
 	std::unique_ptr<Sports> sports(new Sports());
 	try {
 		while (1) {
-			//14 7 8 ne radi
 			std::cout << "\n-----------------------------------------------------------------------------------------------------------------------\nUnesite opciju:\n0. Exit\n1. Unos podataka\n2. Ispis podataka atleta\n3. Ucitavanje podataka eventova\n4. Ispis podataka eventova";
 			std::cout << "\n5. Ukupan broj ucesnika na olimpijskim igrama\n6. Ukupan broj razlicitih disciplina na Olimpijskim igrama\n7. Srednja vrednost visine svih takmicara\n8. Srednja vrednost tezine svih takmicara";
 			std::cout << "\n9. Odredjivanje broja razlicitih sportova u kojima je zadata drzava osvojila barem jednu medalju\n10. Odredjivanje drzava koje su na barem jednim Olimpijskim igrama ostvarile najbolji uspeh\n11. Odredjivanje svih gradova u kojima su olimpijske igre odrzane barem jednom";
@@ -75,7 +74,11 @@ int main()
 				exit(0);
 
 			case 1:
-				std::cout << "Unos podataka je u toku za athlete";
+				if (athletes->getSize() != 0) {
+					std::cout << "Uneli ste podatke athleta" << std::endl;
+					break;
+				}
+				std::cout << "Unos podataka je u toku za athlete" << std::endl;
 				while (fgets(bufferInAthC, sizeof bufferInAthC, fileAthC) != NULL)
 				{
 					vecFileAth.emplace_back(bufferInAthC);
@@ -108,7 +111,7 @@ int main()
 			case 2:
 				if (!isDataLoaded1)
 				{
-					std::cout << "Unesite podatke atleta prvo!";
+					std::cout << "Unesite podatke atleta prvo!" << std::endl;
 					break;
 				}
 				begin = std::chrono::high_resolution_clock::now();
@@ -126,7 +129,11 @@ int main()
 			case 3:
 				if (!isDataLoaded1)
 				{
-					std::cout << "Unesite podatke atleta prvo!";
+					std::cout << "Unesite podatke atleta prvo!" << std::endl;
+					break;
+				}
+				if (events->getSize() != 0) {
+					std::cout << "Uneli ste podatke eventova!" << std::endl;
 					break;
 				}
 				std::cout << "Unos podataka je u toku za eventove";
@@ -165,7 +172,7 @@ int main()
 			case 4:
 				if (!isDataLoaded1 || !isDataLoaded2)
 				{
-					std::cout << "Unesite podatke atleta i eventova prvo!";
+					std::cout << "Unesite podatke atleta i eventova prvo!" << std::endl;
 					break;
 				}
 				std::cout << "Unesite koliko linija zelite da se istampa:\nProizvoljan negativan broj za ispis svih takmicara\n";
@@ -175,7 +182,7 @@ int main()
 					n = events->getSize();
 				std::cout << events->getSize() << std::endl;
 				for (int i = 0; i < n; i++)
-					std::cout << events->getEvent(i) << std::endl;
+					std::cout << *events->getEvent(i) << std::endl;
 				end = std::chrono::high_resolution_clock::now();
 				std::cout << "\nIzvrsena komanda za = " << std::chrono::duration_cast<std::chrono::seconds> (end - begin).count() << "." << std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count() << std::endl;
 				break;
@@ -183,7 +190,7 @@ int main()
 			case 5:
 				if (!isDataLoaded1 || !isDataLoaded2)
 				{
-					std::cout << "Unesite podatke atleta i eventova prvo!";
+					std::cout << "Unesite podatke atleta i eventova prvo!" << std::endl;
 					break;
 				}
 				begin = std::chrono::high_resolution_clock::now();
@@ -195,7 +202,7 @@ int main()
 			case 6:
 				if (!isDataLoaded1 || !isDataLoaded2)
 				{
-					std::cout << "Unesite podatke atleta i eventova prvo!";
+					std::cout << "Unesite podatke atleta i eventova prvo!" << std::endl;
 					break;
 				}
 				begin = std::chrono::high_resolution_clock::now();
@@ -207,11 +214,11 @@ int main()
 			case 7:
 				if (!isDataLoaded1 || !isDataLoaded2)
 				{
-					std::cout << "Unesite podatke atleta i eventova prvo!";
+					std::cout << "Unesite podatke atleta i eventova prvo!" << std::endl;
 					break;
 				}
 				begin = std::chrono::high_resolution_clock::now();
-				std::cout << "\n" << events->getAverageHeightOfAllCompetitors(countries, sports);
+				std::cout << "\n" << events->getAverageHeightOfAllCompetitors(countries, sports) << "cm\n";
 				end = std::chrono::high_resolution_clock::now();
 				std::cout << "\nIzvrsena komanda za = " << std::chrono::duration_cast<std::chrono::seconds> (end - begin).count() << "." << std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count() << std::endl;
 				break;
@@ -219,18 +226,18 @@ int main()
 			case 8:
 				if (!isDataLoaded1 || !isDataLoaded2)
 				{
-					std::cout << "Unesite podatke atleta i eventova prvo!";
+					std::cout << "Unesite podatke atleta i eventova prvo!" << std::endl;
 					break;
 				}
 				begin = std::chrono::high_resolution_clock::now();
-				std::cout << events->getAverageWeightOfAllCompetitors(countries, sports);
+				std::cout << events->getAverageWeightOfAllCompetitors(countries, sports) << "kg\n";
 				end = std::chrono::high_resolution_clock::now();
 				std::cout << "\nIzvrsena komanda za = " << std::chrono::duration_cast<std::chrono::seconds> (end - begin).count() << "." << std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count() << std::endl;
-
+				break;
 			case 9:
 				if (!isDataLoaded1 || !isDataLoaded2)
 				{
-					std::cout << "Unesite podatke atleta i eventova prvo!";
+					std::cout << "Unesite podatke atleta i eventova prvo!" << std::endl;
 					break;
 				}
 				begin = std::chrono::high_resolution_clock::now();
@@ -242,7 +249,7 @@ int main()
 			case 10:
 				if (!isDataLoaded1 || !isDataLoaded2)
 				{
-					std::cout << "Unesite podatke atleta i eventova prvo!";
+					std::cout << "Unesite podatke atleta i eventova prvo!" << std::endl;
 					break;
 				}
 				begin = std::chrono::high_resolution_clock::now();
@@ -255,7 +262,7 @@ int main()
 			case 11:
 				if (!isDataLoaded1 || !isDataLoaded2)
 				{
-					std::cout << "Unesite podatke atleta i eventova prvo!";
+					std::cout << "Unesite podatke atleta i eventova prvo!" << std::endl;
 					break;
 				}
 				begin = std::chrono::high_resolution_clock::now();
@@ -268,7 +275,7 @@ int main()
 			case 12:
 				if (!isDataLoaded1 || !isDataLoaded2)
 				{
-					std::cout << "Unesite podatke atleta i eventova prvo!";
+					std::cout << "Unesite podatke atleta i eventova prvo!" << std::endl;
 					break;
 				}
 				begin = std::chrono::high_resolution_clock::now();
@@ -281,11 +288,13 @@ int main()
 			case 13:
 				if (!isDataLoaded1 || !isDataLoaded2)
 				{
-					std::cout << "Unesite podatke atleta i eventova prvo!";
+					std::cout << "Unesite podatke atleta i eventova prvo!" << std::endl;
 					break;
 				}
 				begin = std::chrono::high_resolution_clock::now();
 				vectorAthleta = events->getAllTheAthletesThatCompetedInPairOfGames(athletes, games);
+				if (vectorAthleta.size() == 0)
+					std::cout << "Nema ih" << std::endl;
 				for_each(vectorAthleta.begin(), vectorAthleta.end(), [](const Athlete& x) {std::cout << x << std::endl; });
 				end = std::chrono::high_resolution_clock::now();
 				std::cout << "\nIzvrsena komanda za = " << std::chrono::duration_cast<std::chrono::seconds> (end - begin).count() << "." << std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count() << std::endl;
@@ -294,18 +303,35 @@ int main()
 			case 14:
 				if (!isDataLoaded1 || !isDataLoaded2)
 				{
-					std::cout << "Unesite podatke atleta i eventova prvo!";
+					std::cout << "Unesite podatke atleta i eventova prvo!" << std::endl;
 					break;
 				}
 				begin = std::chrono::high_resolution_clock::now();
-				parovi = events->getPairOfCountryAthleteThatWonAtLeastOneMedalInTeamAndIndividual(athletes);
-				for_each(parovi.begin(), parovi.end(), [](const std::pair<std::string, Athlete>& x) {std::cout << x.first << " - " << x.second << std::endl; });
+				try {
+					std::cout << "1\n";
+					parovi = events->getPairOfCountryAthleteThatWonAtLeastOneMedalInTeamAndIndividual(athletes);
+					std::cout << "\n";
+					for_each(parovi.begin(), parovi.end(), [](const std::pair<std::string, Athlete>& x) {std::cout << x.first << " - " << x.second << std::endl; });
+				}
+				catch (std::exception& e) {
+					std::cout << e.what() << std::endl;
+				}
 				end = std::chrono::high_resolution_clock::now();
 				std::cout << "\nIzvrsena komanda za = " << std::chrono::duration_cast<std::chrono::seconds> (end - begin).count() << "." << std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count() << std::endl;
 				break;
 
+			case 15:
+				std::cout << "Unesite vrednost kolko da stampam:"<< std::endl;
+				std::cin >> n;
+				for (int i = 0; i < n; i++)
+				{
+					std::cout << "Atleta #" << i << " " << athletes->getAthlete(i) << std::endl;
+				}
+
+				break;
+
 			default:
-				std::cout << "Odabrana opcija ne postoji, izaberite ponovo.";
+				std::cout << "Odabrana opcija ne postoji, izaberite ponovo." << std::endl;
 				break;
 			}
 		}

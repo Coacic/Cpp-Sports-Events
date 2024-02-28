@@ -23,30 +23,27 @@ Events::~Events()
 	eventsMu4.~vector();
 }
 
-void Events::readEventMu(const std::string str, std::unique_ptr<Athletes>& listOfAthletes, std::unique_ptr<Countries>& listOfCountries, std::unique_ptr<Sports>& sports, std::unique_ptr<Games>& games, int i)
+void Events::readEventMu(const std::string str, const std::unique_ptr<Athletes>& listOfAthletes, std::unique_ptr<Countries>& listOfCountries, std::unique_ptr<Sports>& sports, std::unique_ptr<Games>& games, int i)
 {
-	std::stringstream ids;
 	std::string* country = nullptr;
 	std::string* sport = nullptr;
-	std::vector<int> listOfAthleteIds;
 	int index;
-	Athlete* ath = nullptr;
+	Athlete* ath = nullptr; 
+	Team* teamOfPlayersList = nullptr;
 	std::regex rgx("([^!]*)!([^!]*)!([^!]*)!([^!]*)!([^!]*)!([^!]*)!([^!]*)!(\\w*)");
 	std::regex rgx2("(\\d+)");
 	std::smatch match;
 	try {
 		if (std::regex_search(str.begin(), str.end(), match, rgx))
 		{
-			Team* teamOfPlayersList = new Team(match[3]);
 			if (match[5].str() == "Individual")
 			{
 				int id = std::stoi(match[7]);
-				ath = &listOfAthletes->findById(id);
-				teamOfPlayersList->~Team();
-				teamOfPlayersList = nullptr;
+				ath = listOfAthletes->findById(id);
 			}
 			else if (match[5].str() == "Team")
 			{
+				teamOfPlayersList = new Team(match[3]);
 				std::string word(match[7]);
 				auto words_begin = std::sregex_iterator(word.begin(), word.end(), rgx2);
 				auto words_end = std::sregex_iterator();
@@ -55,17 +52,8 @@ void Events::readEventMu(const std::string str, std::unique_ptr<Athletes>& listO
 					std::smatch match = *i;
 					std::string match_str = match.str();
 					if (!match_str.empty() && std::find_if(match_str.begin(), match_str.end(), [](unsigned char c) { return !std::isdigit(c); }) == match_str.end())
-						teamOfPlayersList->pushAthlete(listOfAthletes->findById(std::stoi(match_str)));
+						teamOfPlayersList->pushAthlete(*listOfAthletes->findById(std::stoi(match_str)));
 				}
-				//parseTeam(match[7].str(), &listOfAthleteIds);
-				//for (auto it2 = listOfAthleteIds.begin(); it2 != listOfAthleteIds.end(); it2++)
-				//{
-				//	ath = &listOfAthletes->findById(*it2);
-				//	//itAth = std::find_if(listOfAthletes.begin(), listOfAthletes.end(), [&num](Athlete* x) { return x->getId() == num; });
-				//	teamOfPlayersList->pushAthlete(*ath);
-				//}
-				ath = nullptr;
-				//teamOfPlayersList->pushAthlete(*(*listOfAthletes).findById(std::stoi(match_str)));
 			}
 			country = &(*listOfCountries->findCountry(match[6]));
 			if (!country) {
@@ -79,10 +67,6 @@ void Events::readEventMu(const std::string str, std::unique_ptr<Athletes>& listO
 			}
 			if ((index = games->contains(match[4].str()) == -1))
 				index = games->push(match[4]);
-			//if (match.suffix() == '\n')
-			//	match.suffix().str().clear();
-			//Medal* medal = match.suffix();
-			//Event* eve = new Event(match[1], match[2], sport, *games.getGames(index), match[5], country, match.suffix(), ath, teamOfPlayersList);
 			switch (i)
 			{
 			case 0:
@@ -98,20 +82,12 @@ void Events::readEventMu(const std::string str, std::unique_ptr<Athletes>& listO
 				eventsMu4.emplace_back(match[1], match[2], sport, games->findGames(match[4]), match[5], country, match[8], ath, teamOfPlayersList);
 				break;
 			}
-			//events.emplace_back(*new Event(match[1], match[2], sport, games->findGames(match[4]), match[5], country, match[8], ath, teamOfPlayersList));
-			//new Event(match[1].str(), match[2].str(), sport, games.getGames(index), match[5].str(), country, match.suffix(), ath, teamOfPlayersList)
-			//std::string _date, std::string _city, Sports* _sport, std::string _cup, std::string _type, std::string* country, std::string* _medal, Athlete* _athlete, Team* _team
 		}
 	}
 	catch (std::exception e)
 	{
 		std::cout << "\nError : \n" << e.what() << std::endl;
 	}
-	//}
-	//catch (std::exception e)
-	//{
-	//	return;
-	//}
 }
 
 int Events::getCountHowManyRewardsForDifferentSports()
@@ -124,14 +100,14 @@ int Events::getCountHowManyRewardsForDifferentSports()
 	std::vector<int>::iterator it2 = flags.begin();
 	std::cout << "Unesite datu drzavu:" << std::endl;
 	std::cin >> country;
-	for_each(events.begin(), events.end(), [&it2, &country](Event const& p)
+	for_each(events.begin(), events.end(), [&it2, &country](Event& p)
 		{
 			if (p.getCountry() != country || p.getMedal().empty())
 				*it2 = 1;
 			it2++;
 		});
 	it2 = flags.begin();
-	for_each(events.begin(), events.end(), [&vect, &it2](Event const& p)
+	for_each(events.begin(), events.end(), [&vect, &it2](Event& p)
 		{
 			if (std::find(vect.begin(), vect.end(), p.getSport()) == vect.end() && *it2 == 0)
 				vect.push_back(p.getSport());
@@ -145,7 +121,7 @@ std::vector<std::string> Events::getCountriesThatHaveGoldMedal()
 	std::vector<std::string> countries;
 	std::string country;
 	std::cin >> country;
-	for_each(events.begin(), events.end(), [&countries](Event const& p)
+	for_each(events.begin(), events.end(), [&countries](Event& p)
 		{
 			if (p.getMedal() == "Gold" && std::find(countries.begin(), countries.end(), p.getCountry()) == countries.end())
 				countries.push_back(p.getCountry());
@@ -158,7 +134,7 @@ std::vector<std::string> Events::getCitiesThatHostedOlympicsAtLeastOnce()
 	std::vector<std::string> cities;
 	std::string country;
 	std::cin >> country;
-	for_each(events.begin(), events.end(), [&cities](Event const& p)
+	for_each(events.begin(), events.end(), [&cities](Event& p)
 		{
 			if (std::find(cities.begin(), cities.end(), p.getCountry()) == cities.end())
 				cities.push_back(p.getCountry());
@@ -173,9 +149,9 @@ std::vector<Athlete> Events::getAllTheAthletesThatCompetedInPairOfGames(std::uni
 	std::string game1, game2;
 	std::cout << "Unesite par igara:\n";
 	std::cin >> game1 >> game2;
-	for_each(events.begin(), events.end(), [&](Event const& p1)
+	for_each(events.begin(), events.end(), [&](Event& p1)
 		{
-			for_each(events.begin(), events.end(), [&](Event const& p2)
+			for_each(events.begin(), events.end(), [&](Event& p2)
 				{
 					if (!p1.isTeam())
 						if (p1.getCup() == game1 && p2.getCup() == game2 && ((std::find(vector.begin(), vector.end(), *p1.getAthlete())) == vector.end()))
@@ -187,24 +163,29 @@ std::vector<Athlete> Events::getAllTheAthletesThatCompetedInPairOfGames(std::uni
 
 std::vector<std::pair<std::string, Athlete>> Events::getPairOfCountryAthleteThatWonAtLeastOneMedalInTeamAndIndividual(std::unique_ptr<Athletes>& athletes)
 {
-	std::vector<std::pair<std::string, Athlete>> parovi;
-	for_each(events.begin(), events.end(), [&](Event& p1)
-		{
-			if (!p1.getMedal().empty()) {
-				if (!p1.isTeam()) {
+	std::vector<std::pair<std::string, Athlete>> parovi = *new std::vector<std::pair<std::string,  Athlete>>;
+	try {
+		for_each(events.begin(), events.end(), [&](Event& p1)
+			{
+				if (!p1.getMedal().empty() && !p1.isTeam()) {
 					for_each(events.begin(), events.end(), [&](Event& p2)
 						{
 							if (p2.isTeam() && !p2.getMedal().empty() && p2.getTeam().containsAthlete(*p1.getAthlete()))
 							{
 								std::pair<std::string, Athlete> p;
-								p.first = p2.getCountry(); p.second = *p2.getAthlete();
+								p.first = p2.getCountry();
+								p.second = *p1.getAthlete();
 								if (std::find(parovi.begin(), parovi.end(), p) == parovi.end())
 									parovi.push_back(p);
 							}
 						});
 				}
-			}
-		});
+			});
+	}
+	catch (std::exception& e) {
+		std::cout << e.what() << std::endl;
+		return *new std::vector<std::pair<std::string, Athlete>>;
+	}
 	return parovi;
 }
 
@@ -214,13 +195,11 @@ std::vector<std::string> Events::findTenYoungestAthletesWithMedalsFirstOccurence
 	std::vector<int> flags(events.size(), 0);
 	std::vector<Event>::iterator it;
 	std::vector<int>::iterator it2 = flags.begin();
-	for_each(events.begin(), events.end(), [&vect, &it2](Event const& p)
+	for_each(events.begin(), events.end(), [&vect, &it2](Event& p)
 		{
 			if (p.getMedal().empty())
 				*it2 = 1;
 		});
-	//if (std::find(vect.begin(), vect.end(), p.getCountry()) == vect.end())
-	//	vect.push_back(*p.getAthlete());
 	std::vector<std::string> s;
 	return s;
 }
@@ -233,7 +212,7 @@ std::vector<std::string> Events::getThreeBestCountries(Athlete* athletes)
 	std::vector<int> flags(events.size(), 0);
 	std::vector<Event>::iterator it;
 	std::vector<int>::iterator it2 = flags.begin();
-	for_each(events.begin(), events.end(), [&vect, &it2](Event const& p)
+	for_each(events.begin(), events.end(), [&vect, &it2](Event & p)
 		{
 			if (p.getMedal().empty())
 				*it2 = 1;
@@ -242,9 +221,8 @@ std::vector<std::string> Events::getThreeBestCountries(Athlete* athletes)
 	return s;
 }
 
-void Events::readEventsMu(std::vector<std::string>& vecFileEve, std::unique_ptr<Athletes>& athletes, std::unique_ptr<Countries>& countries, std::unique_ptr<Sports>& sports, std::unique_ptr<Games>& games, int i)
+void Events::readEventsMu(std::vector<std::string>& vecFileEve, const std::unique_ptr<Athletes>& athletes, std::unique_ptr<Countries>& countries, std::unique_ptr<Sports>& sports, std::unique_ptr<Games>& games, int i)
 {
-	//std::vector<std::string> vecFileAth, int i
 	std::vector<std::string>::iterator it;
 	for (it = vecFileEve.begin(); it != vecFileEve.end(); it++)
 		readEventMu(*it, athletes, countries, sports, games, i);
@@ -255,7 +233,7 @@ int Events::getCountOfCompetitors(std::unique_ptr<Countries>& countries, std::un
 	std::vector<char> flags(filterData(countries, sports));
 	int n = 0;
 	std::vector<char>::iterator it = flags.begin();
-	for (auto const& x : events)
+	for (auto & x : events)
 	{
 		if (x.getAthlete() && *it == 0)
 		{
@@ -277,7 +255,7 @@ int Events::getNumberOfDifferentSports(std::unique_ptr<Countries>& countries, st
 	std::vector<std::string>::iterator vectIt;
 	int n = 0;
 	std::vector<char>::iterator it2 = flags.begin();
-	for (auto const& x : events)
+	for (auto& x : events)
 	{
 		if ((vectIt = std::find(vect.begin(), vect.end(), x.getSport())) == vect.end()) {
 			vect.push_back(x.getSport());
@@ -292,26 +270,29 @@ int Events::getAverageWeightOfAllCompetitors(std::unique_ptr<Countries>& countri
 	std::vector<char> flags(filterData(countries, sports));
 	int n = 0, weight = 0, count = 0;
 	std::vector<char>::iterator it = flags.begin();
-	for (const Event& x : events)
-	{
-		if (*it == 0 && (x.getAthlete() != nullptr)) {
-			if (x.getAthlete()->getWeight() == "NA" || x.getAthlete()->getWeight().empty()) {}
-			else
-			{
-				weight += std::stoi(x.getAthlete()->getWeight());
-				count++;
-			}
-		}
-		else if (*it == 0) {
-			for (int i = 0; i < x.getTeam().getSize(); i++)
-			{
-				if (x.getTeam().getAthlete(i).getWeight() != "NA") {
-					weight += std::stoi(x.getTeam().getAthlete(i).getWeight());
+	try {
+		for (Event& x : events)
+		{
+			if (*it == 0 && (x.getAthlete() != nullptr)) {
+				if (x.getAthlete()->getWeight().std::string::find("NA") == std::string::npos && !x.getAthlete()->getWeight().empty()) {
+					weight += std::stoi(x.getAthlete()->getWeight());
 					count++;
 				}
 			}
+			else if (*it == 0) {
+				for (int i = 0; i < x.getTeam().getSize(); i++)
+				{
+					if (x.getTeam().getAthlete(i).getWeight().std::string::find("NA") == std::string::npos && !x.getTeam().getAthlete(i).getWeight().empty()) {
+						weight += std::stoi(x.getTeam().getAthlete(i).getWeight());
+						count++;
+					}
+				}
+			}
+			it++;
 		}
-		it++;
+	}
+	catch (std::exception& e) {
+		std::cout << e.what() << std::endl;
 	}
 	if (count == 0)
 		return 0;
@@ -323,13 +304,13 @@ int Events::getSize()
 	return (int)events.size();
 }
 
-const Event Events::getEvent(int i) const
+const Event* Events::getEvent(int i) const
 {
 	auto itEnd = events.begin();
 	if (i > events.size())
-		return *events.end();
+		return &*events.end();
 	std::advance(itEnd, i);
-	return *itEnd;
+	return &*itEnd;
 }
 
 bool compareTeam(Team i1, Team i2)
@@ -373,24 +354,48 @@ int Events::getAverageHeightOfAllCompetitors(std::unique_ptr<Countries>& countri
 	int n = 0, height = 0, count = 0;
 	std::vector<char>::iterator it = flags.begin();
 	const Team* team = nullptr;
-	for (const Event& x : events)
-	{
-		if (*it == 0 && x.getAthlete()) {
-			if (x.getAthlete()->getHeight() != "NA" || x.getAthlete()->getHeight().empty()) {
-				height += std::stoi(x.getAthlete()->getHeight());
-				count++;
-			}
-		}
-		else if (*it == 0) {
-			for (int i = 0; i < x.getTeam().getSize(); i++)
-			{
-				if (x.getTeam().getAthlete(i).getHeight() != "NA" || x.getTeam().getAthlete(i).getHeight().empty()) {
-					height += std::stoi(x.getTeam().getAthlete(i).getHeight());
+	try {
+
+		for ( Event& x : events)
+		{
+			if (*it == 0 && x.getAthlete() != NULL) {
+				if (x.getAthlete()->getHeight().std::string::find("NA") == std::string::npos && !x.getAthlete()->getHeight().empty()) {
+					try {
+					height += std::stoi(x.getAthlete()->getHeight());
 					count++;
+					}
+					catch(std::invalid_argument& e){
+						std::cout << e.what() << std::endl;
+						std::cout << "Atleta: " << x.getAthlete()->getName() << " pravi problem, visina:" << x.getAthlete()->getHeight() <<"''" << std::endl;
+					}
+					catch (...) {
+						std::cout << "Something else : " << std::endl;
+					}
 				}
 			}
+			else if (*it == 0) {
+				for (int i = 0; i < x.getTeam().getSize(); i++)
+				{
+					if (x.getTeam().getAthlete(i).getHeight().std::string::find("NA") == std::string::npos && !x.getTeam().getAthlete(i).getHeight().empty()) {
+						try {
+							height += std::stoi(x.getTeam().getAthlete(i).getHeight());
+							count++;
+						}
+						catch (std::invalid_argument& e) {
+							std::cout << e.what() << std::endl;
+							std::cout << x.getAthlete() << std::endl;
+						}
+						catch (...) {
+							std::cout << "Something else : " << std::endl;
+						}
+					}
+				}
+			}
+			it++;
 		}
-		it++;
+	}
+	catch (std::exception& e) {
+		std::cout << e.what() << std::endl;
 	}
 	if (count == 0)
 		return 0;
@@ -439,7 +444,7 @@ std::vector<char> Events::filterData(std::unique_ptr<Countries>& countries, std:
 					std::cout << "Unesite validan sport" << std::endl;
 					wrongInput = 1;
 				}
-				for_each(events.begin(), events.end(), [&it, &sport](Event const& p)
+				for_each(events.begin(), events.end(), [&it, &sport](Event & p)
 					{
 						if (p.getSport() != sport)
 							*it = 1;
@@ -454,7 +459,7 @@ std::vector<char> Events::filterData(std::unique_ptr<Countries>& countries, std:
 					std::cout << "Unesite validnu drzavu" << std::endl;
 					wrongInput = 1;
 				}
-				for_each(events.begin(), events.end(), [&it, &country](Event const& p)
+				for_each(events.begin(), events.end(), [&it, &country](Event & p)
 					{
 						if (p.getCountry() != country)
 							*it = 1;
@@ -470,7 +475,7 @@ std::vector<char> Events::filterData(std::unique_ptr<Countries>& countries, std:
 					std::cout << "\nUnesite cifre za filter za godine!" << std::endl;
 					wrongInput = 1;
 				}
-				for_each(events.begin(), events.end(), [&it, &year](Event const& p)
+				for_each(events.begin(), events.end(), [&it, &year](Event & p)
 					{
 						if (p.getDate().find(year))
 							*it = 1;
@@ -482,14 +487,14 @@ std::vector<char> Events::filterData(std::unique_ptr<Countries>& countries, std:
 				std::cout << "\nUnesite filter na osnovu da li je tim ili atleta\n0 - Individualni\n1 - Team\n";
 				std::cin >> type;
 				if (type == 0)
-					for_each(events.begin(), events.end(), [&it, &type](Event const& p)
+					for_each(events.begin(), events.end(), [&it, &type](Event & p)
 						{
 							if (!p.getAthlete())
 								*it = 1;
 							it++;
 						});
 				else
-					for_each(events.begin(), events.end(), [&it, &type](Event const& p)
+					for_each(events.begin(), events.end(), [&it, &type](Event & p)
 						{
 							if (p.getAthlete())
 								*it = 1;
@@ -502,14 +507,14 @@ std::vector<char> Events::filterData(std::unique_ptr<Countries>& countries, std:
 				std::cin >> medal;
 				if (medal == "Gold" || medal == "Silver" || medal == "Bronze" || medal == "!") {
 					if (medal == "!")
-						for_each(events.begin(), events.end(), [&it, &medal](Event const& p)
+						for_each(events.begin(), events.end(), [&it, &medal](Event & p)
 							{
 								if (!p.getMedal().empty())
 									*it = 1;
 								it++;
 							});
 					else
-						for_each(events.begin(), events.end(), [&it, &medal](Event const& p)
+						for_each(events.begin(), events.end(), [&it, &medal](Event & p)
 							{
 								if (p.getMedal() != medal)
 									*it = 1;

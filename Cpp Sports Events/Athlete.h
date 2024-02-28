@@ -10,6 +10,7 @@ class Athlete : public Competitor{
 public:
 	Athlete(int, std::string, std::string, std::string, std::string, std::string);
 	Athlete();
+	Athlete(const Athlete& ath);
 	~Athlete();
 	const int getId() const;
 	const std::string& getAge() const;

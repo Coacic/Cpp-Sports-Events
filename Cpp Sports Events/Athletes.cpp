@@ -23,7 +23,6 @@ Athletes::~Athletes()
 
 void Athletes::readAthlete(const std::string str)
 {
-
 	std::lock_guard<std::mutex> guard(athLock);
 	std::regex rgx("([0-9]*)!([^!]*)!(NA|[MF])!([^!])!([^!])!([^!])");
 	std::smatch match;
@@ -34,13 +33,10 @@ void Athletes::readAthlete(const std::string str)
 void Athletes::readAthleteMu(const std::string str, std::vector<Athlete>& vec)
 
 {
-	//std::lock_guard<std::mutex> guard(athLock);
 	std::regex rgx("([0-9]*)!([^!]*)!(NA|[MF])!([^!]*)!([^!]*)!([^\n]*)");
 	std::smatch match;
 		if (std::regex_search(str.begin(), str.end(), match, rgx))
 			vec.emplace_back(std::stoi(match[1]), match[4], match[6], match[5], match[2], match[3].str());
-	//if (std::regex_search(str.begin(), str.end(), match, rgx))
-	//	athletes.emplace_back(*new Athlete(std::stoi(match[1]), match[4], match[6], match[5], match[2], match[3].str()));
 }
 
 void Athletes::readAthletesMu(std::vector<std::string> vecFileAth, int i)
@@ -73,7 +69,7 @@ void Athletes::readAthletesMu(std::vector<std::string> vecFileAth, int i)
 	}
 }
 
-Athlete Athletes::getAthlete(int i) const
+const Athlete Athletes::getAthlete(const int i) const
 {
 	auto itEnd = athletes.begin();
 	if (i > athletes.size())
@@ -95,11 +91,11 @@ void Athletes::combineMu()
 	athletes.insert(std::end(athletes), std::begin(muAth4), std::end(muAth4));
 }
 
-Athlete& Athletes::findById(int id)
+Athlete* Athletes::findById(const int id)
 {
 	std::vector<Athlete>::iterator itAth = std::find_if(athletes.begin(), athletes.end(), [&id](Athlete x) { return x.getId() == id; });
 	auto* it = itAth._Ptr;
-	return *itAth;
+	return &*itAth;
 }
 
 std::vector<Athlete> Athletes::findTheListOfYoungestAthletes(int n)
@@ -110,17 +106,6 @@ std::vector<Athlete> Athletes::findTheListOfYoungestAthletes(int n)
 	athl.reserve((n + 1));
 	if (n <= 0)
 		return athl;
-	//for (int i = 0; i < n; i++)
-	//{
-	//	//athlete = &this->getAthlete(i);
-	//	athlIt = std::min_element(athletes.begin(), athletes.end());
-	//	athlete = &*athlIt;
-	//	athl.emplace_back(athlete);
-	//}
-	//for (int i = 0; i < n; i++)
-	//{
-	//	athlIt = athl.begin();
-	//}
 	return athl;
 }
 

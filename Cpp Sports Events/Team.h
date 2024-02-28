@@ -2,7 +2,7 @@
 #define _TEAM_H_
 #include "Athletes.h"
 
-class Team : public Competitor{
+class Team : public Competitor {
 	std::vector<Athlete> team;
 	std::string sport;
 public:
@@ -22,4 +22,3 @@ public:
 };
 
 #endif // !_TEAM_H_
-

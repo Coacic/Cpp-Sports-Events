@@ -2,8 +2,8 @@
 #define _EVENT_H_
 #include "Team.h"
 
-class Event{
-	std::string date, city, *cup, type, *country, medal, *sport;
+class Event {
+	std::string date, city, * cup, type, * country, medal, * sport;
 	Athlete* athlete;
 	Team team;
 	char isTeamFlag;

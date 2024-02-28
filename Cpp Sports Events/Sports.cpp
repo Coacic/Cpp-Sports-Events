@@ -2,8 +2,6 @@
 
 std::ostream& operator<<(std::ostream& os, const Sports& s)
 {
-	//os << *s.getSport();
-	//return os;
 	return os;
 }
 
@@ -37,8 +35,6 @@ std::string* Sports::findSport(std::string _sport)
 	if (it == sports.end())
 		return NULL;
 	return &*it;
-	//auto* it2 = it._Ptr;
-	//return &(*it2);
 }
 
 void Sports::pushSport(std::string _sport)

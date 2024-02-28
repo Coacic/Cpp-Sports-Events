@@ -14,7 +14,7 @@ Team::Team(std::string s)
 	sport = s;
 }
 
-Team::Team(const Team&t)
+Team::Team(const Team& t)
 {
 	for (int i = 0; i < t.getSize(); i++)
 	{
@@ -60,7 +60,7 @@ const Athlete& Team::getAthlete(int i) const
 	return *iter;
 }
 
-const bool Team::containsAthlete(Athlete const & ath) const
+const bool Team::containsAthlete(Athlete const& ath) const
 {
 	auto it = find(team.begin(), team.end(), ath);
 	if (it != team.end())

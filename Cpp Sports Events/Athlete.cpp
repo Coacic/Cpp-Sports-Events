@@ -13,11 +13,21 @@ Athlete::Athlete(int _id, std::string _age, std::string _weight, std::string _he
 Athlete::Athlete()
 {
 	id = NULL;
-	age = nullptr;
-	weight = nullptr;
-	height = nullptr;
-	name = nullptr;
+	age = "";
+	weight = "";
+	height = "";
+	name = "";
 	gender = 0;
+}
+
+Athlete::Athlete(const Athlete& ath)
+{
+	id = ath.getId();
+	age = ath.getAge();
+	weight = ath.getWeight();
+	height = ath.getHeight();
+	name = ath.getName();
+	gender = ath.getGender();
 }
 
 Athlete::~Athlete()
@@ -72,7 +82,7 @@ const std::string& Athlete::getHeight() const
 
 std::ostream& operator<<(std::ostream& os, const Athlete& a)
 {
-	os << a.getId() << " " << a.getName() << " " << a.getGender() << " "
+	os << "- " << a.getId() << " " << a.getName() << " " << a.getGender() << " "
 		<< a.getAge() << " " << a.getHeight() << " " << a.getWeight();
 	return os;
 }
